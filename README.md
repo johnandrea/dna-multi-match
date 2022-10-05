@@ -70,6 +70,7 @@ graphviz -Tsvg out.dot -o out.svg
 ## Example
 
 Several people in a family have taken a DNA test, but each has a matched family member which they can't identify.
+They want to find the person who is common among all their potential matches.
 The known generalogy is illustrated here:
 
 ![Family](example-1/family.png)
@@ -88,11 +89,27 @@ T3 matched the unidentified person at 400 cM. It could be one of these people:
 
 ![T3 matches](example-1/t3.png)
 
-The program was run like this:
+The program was run like this to compute the intersection of all the potential matches.
 
 ```
-dna-multi-match.py family.ged --show --testers 1,1000 11,2000 21,400  >r.dot  2>r.err
+dna-multi-match.py family.ged --testers 1,1000 11,2000 21,400  >f.dot  2>f.err
+graphviz -Tpng f.dot -o f.png
 ```
+
+The program prints (in f.err) the results:
+
+```
+The intersection of matches has 2 people
+    B (xref 15)
+    C (xref 16)
+```
+
+The output diagram is:
+
+![Results](example-1/result.png)
+
+indicating that the unidentified person is either "B" or "C". Or the person might be someone not yet known genealogically.
+
 
 
 ## Bug reports
