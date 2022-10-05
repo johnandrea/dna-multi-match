@@ -91,7 +91,7 @@ T3 matched the unidentified person at 400 cM. It could be one of these blood rel
 
 ![T3 matches](example-1/t3.png)
 
-The program was run like this to compute the intersection of all the potential matches.
+In the input GEDCOM file T1 has the xref of @I1@, T2 has the xref of @I11@, and T3 has the xref of @I21@. The program was run like this to compute the intersection of all the potential matches.
 
 ```
 dna-multi-match.py family.ged --testers 1,1000 11,2000 21,400  >f.dot  2>f.err
