@@ -77,15 +77,15 @@ The known generalogy is illustrated here:
 
 There are three DNA testers named T1, T2, T3.
 
-T1 matched the unidentified person at 1000 cM. It could be one of the these people:
+T1 matched the unidentified person at 1000 cM. It could be one of the these blood relatives:
 
 ![T1 matches](example-1/t1.png)
 
-T2 matched the unidentified person at 2000 cM. It could be one of these people:
+T2 matched the unidentified person at 2000 cM. It could be one of these blood relatives:
 
 ![T2 matches](example-1/t2.png)
 
-T3 matched the unidentified person at 400 cM. It could be one of these people:
+T3 matched the unidentified person at 400 cM. It could be one of these blood relatives:
 
 ![T3 matches](example-1/t3.png)
 
