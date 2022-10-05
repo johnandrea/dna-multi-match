@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 """
-?
+Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
@@ -48,10 +48,14 @@ def load_my_module( module_name, relative_path ):
 def get_program_options():
     results = dict()
 
+    orientations = [ 'tb', 'lr', 'bt', 'rl' ]
+
     results['infile'] = None
     results['testers'] = None
     results['max-results'] = 14
     results['min-testers'] = 3
+    results['smallest-match'] = 866 #average 1st cousin
+    results['orientation'] = 'lr'
     results['iditem'] = 'xref'
     results['show-each'] = False
     results['reverse'] = False
@@ -59,6 +63,12 @@ def get_program_options():
 
     arg_help = 'Display intersection of potential matches from multiple testers.'
     parser = argparse.ArgumentParser( description=arg_help )
+
+    arg_help = 'At least one match must have a DNA value bigger than this value. Default: ' + str(results['smallest-match'])
+    parser.add_argument( '--smallest-match', default=results['smallest-match'], type=int, help=arg_help )
+
+    arg_help = 'Orientation of the output dot file tb=top-bottom, lt=left-right, etc. Default:' + results['orientation']
+    parser.add_argument( '--orientation', default=results['orientation'], type=str, help=arg_help )
 
     arg_help = 'Minimum number of needed testers. Default ' + str(results['min-testers'])
     parser.add_argument( '--min-testers', default=results['min-testers'], type=int, help=arg_help )
@@ -74,7 +84,7 @@ def get_program_options():
     parser.add_argument( '--show-each', default=results['show-each'], action='store_true', help=arg_help )
 
     # in dot files, change direction of the arrows
-    arg_help = 'For dot file output, reverse the order of the links.'
+    arg_help = 'For dot file output, reverse the order of the link arrows.'
     parser.add_argument( '--reverse', default=results['reverse'], action='store_true', help=arg_help )
 
     # maybe this should be changed to have a type which better matched a directory
@@ -96,6 +106,13 @@ def get_program_options():
     results['infile'] = args.infile.name
     results['reverse'] = args.reverse
     results['libpath'] = args.libpath
+
+    # don't allow an impossible value
+    if args.smallest_match > 1:
+       results['smallest-match'] = args.smallest_match
+
+    if args.orientation.lower() in orientations:
+       results[''] = args.orientation.lower()
 
     return results
 
@@ -153,7 +170,12 @@ def get_name( individual ):
 
 def define_dna_ranges():
    # values via DNA Painter Shared cM Project
-   # https://dnapainter.com/tools/sharedcmv4
+   # https://dnapainter.com/tools/sharedcmv
+   #
+   # Note the use of non-gender specific labels
+   # "auncle" = "aunt or uncle"
+   # "nibling" = "niece or nephew"
+
    results = dict()
    results['1C'] = {'min':396, 'max':1397, 'ave':866}
    results['1C1R'] = {'min':102, 'max':980, 'ave':433}
@@ -221,6 +243,10 @@ def find_relation_label( relation_data ):
     # return a string of the relationship of "them" to "me"
     # as "grandparent", "1C", "auncle", etc
     # given the generation distance to the nearest common ancestor family
+    #
+    # Note the use of non-gender specific labels
+    # "auncle" = "aunt or uncle"
+    # "nibling" = "niece or nephew"
 
     me = relation_data['gen-me']
     them = relation_data['gen-them']
@@ -337,8 +363,6 @@ def find_nearest_common_ancestors( person, person_families, everyones_ancestor_f
 
     persons_ancestor_fams = everyones_ancestor_fams[person]
 
-    show = person == 'i11' #debug
-
     # first get the people who are direct blood ancestors
     for fam in persons_ancestor_fams:
         for partner in ['husb','wife']:
@@ -347,43 +371,25 @@ def find_nearest_common_ancestors( person, person_families, everyones_ancestor_f
                d = persons_ancestor_fams[fam]
                results[ancestor_id] = { 'closest':fam, 'gen-me':d, 'gen-them':0 }
 
-    if show:
-       print( 'showing ancestor checks i11 i22', file=sys.stderr ) #debug
-       print( '   results so far', file=sys.stderr ) #debug
-       for r in results: #debug
-           print( '     ', r, results[r], file=sys.stderr ) #debug
-
     # find descendants
     for them in everyones_ancestor_fams:
-        show = person == 'i11' and them == 'i22' #debug
         if person == them:
            continue  # skip self
         if them in results:
            continue  # skip already added
-        if show: #debug
-           print( '   looking for desc', file=sys.stderr ) #debug
         for ancestor_fam in everyones_ancestor_fams[them]:
             if ancestor_fam in person_families:
                d = everyones_ancestor_fams[them][ancestor_fam]
                results[them] = { 'closest':ancestor_fam, 'gen-me':0, 'gen-them':d }
                continue # found
 
-    if show:
-       print( 'after desc checks i11 i22', file=sys.stderr ) #debug
-       print( '   results so far', file=sys.stderr ) #debug
-       for r in results: #debug
-           print( '     ', r, results[r], file=sys.stderr ) #debug
-
     # then each person who isn't an ancestor or descendant
     for them in everyones_ancestor_fams:
-        show = person == 'i11' and them == 'i22' #debug
         if person == them:
            continue  # skip self
         if them in results:
            continue  # skip already added
         them_ancestor_fams = everyones_ancestor_fams[them]
-        if show:
-           print( '   them ancestor fams', them_ancestor_fams, file=sys.stderr ) #debug
         closest = None
         gen_to_them = None
         gen_to_me = 1000 # a big number of generations to start
@@ -456,16 +462,6 @@ def find_ids_of_testers( tag, testers, individuals ):
     return results
 
 
-#def relatives_in_range( dna_value, relatives, dna_data ):
-#    results = []
-#    for indi in relatives:
-#        relation = label_relation( relatives[indi]['gen-me'], relatives[indi]['gen-them'] )
-#        if relation in dna_data:
-#           if dna_data[relation]['min'] <= dna_value <= dna_data[relation]['max']:
-#              results.append( indi )
-#    return results
-
-
 def person_info( indi ):
     return get_name( data[i_key][indi] ) + ' (xref ' + str(data[i_key][indi]['xref']) + ')'
 
@@ -499,8 +495,8 @@ if len( testers ) != len( options['testers'] ):
 biggest_dna = 0
 for indi in testers:
     biggest_dna = max( biggest_dna, testers[indi] )
-if biggest_dna < dna_ranges['1C']['ave']:
-   print( 'At least one match must be greater than 1st cousin average', file=sys.stderr )
+if biggest_dna < options['smallest-match']:
+   print( 'At least one match must be greater than', options['smallest-match'], file=sys.stderr )
    sys.exit(1)
 
 # everyone gets a list of all their ancestors
@@ -510,10 +506,8 @@ for indi in data[i_key]:
     ancestor_fams[indi] = get_ancestor_families( indi, data[i_key], data[f_key] )
 
 # everyone gets a list of all their blood relativs
-# (why did I do everyone rather than just the testers?)
 
 blood_related = dict()
-#for indi in data[i_key]:
 for indi in testers:
     # first determine, which families have this person as a parent
     as_parent = []
@@ -525,14 +519,6 @@ for indi in testers:
 for indi in testers:
     for other in blood_related[indi]:
         blood_related[indi][other]['label'] = find_relation_label( blood_related[indi][other] )
-
-for indi in testers:
-    print( person_info(indi), 'blood related', len(blood_related[indi]), file=sys.stderr ) #debug
-    for other in blood_related[indi]:
-        print( '   ', person_info(other), blood_related[indi][other], file=sys.stderr ) #debug
-##    for them in testers:
-##        if them in blood_related[indi]:
-##           print( '  ', them, blood_related[indi][them], file=sys.stderr ) #debug
 
 within_range = dict()
 
@@ -548,8 +534,7 @@ for indi in testers:
               within_range[indi].append( other )
               if options['show-each']:
                  print( '   ', person_info(other), blood_related[indi][other]['label'], file=sys.stderr )
-        #else:
-        #   print( '   no relation', relation, file=sys.stderr )
+
     if options['show-each']:
        if not within_range[indi]:
           print( 'No one', file=sys.stderr )
@@ -561,15 +546,7 @@ for indi in testers:
 people = within_range[ list(testers.keys())[0] ]
 for indi in testers:
     temp_list = people
-    print( 'temp people', people, file=sys.stderr ) #debug
-    print( 'intersect with', within_range[indi], file=sys.stderr ) #debug
     people = readgedcom.list_intersection( temp_list, within_range[indi] )
-    print( 'result', people, file=sys.stderr ) #debug
-
-# nope, the testers don't belong in the matches
-#for indi in testers:
-#    if indi not in people:
-#       people.append( indi )
 
 print( 'The intersection of matches has', len(people), 'people', file=sys.stderr )
 
@@ -585,53 +562,3 @@ if len(people) >= options['max-results']:
    print( '', file=sys.stderr )
    print( 'Too many people to draw in a tree', file=sys.stderr )
    sys.exit(1)
-
-
-# # To draw the tree, connect people of interest to ancestor families
-# # and let the drawing program sort it out (Graphviz)
-# #
-# # But at some point, at the top of the tree, families doesn't connect to their ancestors.
-# # In order to know where to stop find the shared ancestor families
-# # who's partners don't have any shared sncestors from the people of interest.
-#
-# # step 1: make the list of all families heading to the top
-# fams_along_paths = dict()
-# for indi in people:
-    # for ancestor_fam in ancestor_fams[indi]:
-        # fams_along_paths[ancestor_fam] = True
-#
-# print( '', file=sys.stderr ) #debug
-# # step 2: list all the shared families of all the people of interest
-# all_shared_fams = dict()
-# for indi in people:
-#     for them in blood_related[indi]:
-#         if them in people and them != indi:
-#            print( 'shared', indi, 'and', them, blood_related[indi][them], file=sys.stderr ) #debug
-#            all_shared_fams[blood_related[indi][them]['closest']] = True
-#
-# # step 3: individuals along the path who don't have a shared ancestor family
-# # The resulting list will be who from each family connects to their parents family.
-# # Aside from the persons of interest who will always connect to their parents.
-# # The from/to portion is a list because a person could have multiple "from" families
-#
-# partner_to_parent = dict()
-# already_tested = []
-# for fam in fams_along_paths:
-#     for partner in ['husb','wife']:
-#         if partner in data[f_key][fam]:
-#            partner_id = data[f_key][fam][partner][0]
-#            for ancestor_fam in ancestor_fams[partner_id]:
-#                if ancestor_fam in all_shared_fams:
-#                   parents = data[i_key][partner_id]['famc'][0]
-#                   dup_test = str(fam) +':'+ str(parents)
-#                   if dup_test in already_tested:
-#                      continue
-#                   already_tested.append( dup_test )
-#                   if partner_id not in partner_to_parent:
-#                      partner_to_parent[partner_id] = []
-#                   partner_to_parent[partner_id].append( { 'from':fam, 'to':parents } )
-#
-# # link people to parents, but only the ones in the path
-# parent_link = dict()
-# for indi in people:
-#    parent_link[indi] = data[i_key][indi]['famc'][0]
