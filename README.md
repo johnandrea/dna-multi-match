@@ -72,7 +72,27 @@ graphviz -Tsvg out.dot -o out.svg
 Several people in a family have taken a DNA test, but each has a matched family member which they can't identify.
 The known generalogy is illustrated here:
 
-![Family]{example-1/family.png}
+![Family](example-1/family.png)
+
+There are three DNA testers named T1, T2, T3.
+
+T1 matched the unidentified person at 1000 cM. It could be one of the these people:
+
+![T1 matches](example-1/t1.png)
+
+T2 matched the unidentified person at 2000 cM. It could be one of these people:
+
+![T2 matches](example-1/t2.png)
+
+T3 matched the unidentified person at 400 cM. It could be one of these people:
+
+![T3 matches](example-1/t3.png)
+
+The program was run like this:
+
+```
+dna-multi-match.py family.ged --show --testers 1,1000 11,2000 21,400  >r.dot  2>r.err
+```
 
 
 ## Bug reports
