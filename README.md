@@ -1,7 +1,9 @@
 # dna-multi-match
 Find the intersection of DNA matches of multiple family members.
 
-The example bwlow provides a scenario which illustrates the program's function.
+The example below provides a scenario which illustrates the program's function.
+
+It is also possible to perform a speculation test by making a different input file with people placed in the tree where an unknown relative might exist.
 
 ## Features
 
