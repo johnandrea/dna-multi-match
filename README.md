@@ -3,7 +3,7 @@ Find the intersection of DNA matches of multiple family members.
 
 The example below provides a scenario which illustrates the program's function.
 
-It is also possible to perform a speculation test by making a different input file with people placed in the tree where an unknown relative might exist.
+It is also possible to perform a speculation test by making a different input file with people placed in the tree where unknown relatives might exist.
 
 ## Features
 
