@@ -1,0 +1,4 @@
+Input file using custom event "EXREF" for identification.
+
+In this case the relevant program options are
+--id-item=type.exref --testers 094,1000 107,2000 439,400
