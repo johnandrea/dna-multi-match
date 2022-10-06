@@ -8,7 +8,7 @@ It is also possible to perform a speculation test by making a different input fi
 ## Features
 
 - Output is a [Graphviz](https://graphviz.org) DOT file to std-out and a text list in std-err.
-- Makes use of [readgedcom.py](https://github.com/johnandrea/readgedcom) library.
+- Makes use of [readgedcom.py](https://github.com/johnandrea/readgedcom) library. V1.15+
 
 ## Limitations
 
