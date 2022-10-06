@@ -7,13 +7,14 @@ It is also possible to perform a speculation test by making a different input fi
 
 ## Features
 
-- Output is a [Graphviz](https://graphviz.org) DOT file.
+- Output is a [Graphviz](https://graphviz.org) DOT file to std-out and a text list in std-err.
 - Makes use of [readgedcom.py](https://github.com/johnandrea/readgedcom) library.
 
 ## Limitations
 
 - Requires Python 3.6+
 - Might not handle "half" relationships properly.
+- Intended for atDNA test results.
 
 ## Installation
 
@@ -38,14 +39,14 @@ See the example below and the .cmd files in the example sets.
 
 --id-item=value
 
-This is the item which will identify the tester. Default is "xref" which is the individual
+Specify the item to identify the tester via each tester id. Default is "xref" which is the individual
 XREF value in the GEDCOM file.
 Other options might be "uuid", etc. If using a GEDCOM custom type specify it as "type." followed by
-the type name, such as "type.extid", "type.refnumber", etc.
+the type name, i.e. "type.extid", "type.refnumber", etc.
 
 --max-results=value
 
-More than this many final matches is considered too many to display. Default is 14.
+The limit on too many final matches to display. Default is 14.
 
 --min-testers=value
 
@@ -58,12 +59,12 @@ to run. Default is 866 which is the average value for a 1st cousin match.
 
 --show-each
 
-If added then the intermediate match results for each tester will be printed to std-err.
+Allow intermediate match results for each tester will be printed to std-err.
 
 --orientation=direction
 
-Change the orientatation of the diagram in the DOT file output. Default is "TB" for top-to-bottom.
-Other choices are "LR" for left-to-right plus "BT" 9bottom-top) and "RL" (right-left).
+Set the orientatation of the diagram in the DOT file output. Default is "TB" for top-to-bottom.
+Other choices are "LR" for left-to-right plus "BT" (bottom-top) and "RL" (right-left).
 
 --reverse-arrows
 
@@ -76,7 +77,7 @@ The directory containing the readgedcom library, relative to the . Default is ".
 ## Usage
 
 ```
-dna-multi-match.py family.ged --testers id1,dna1 id2,dna2 id3,dna3 ... >out.dot  2>out.err
+dna-multi-match.py gedcom-file --testers id1,dna1 id2,dna2 id3,dna3 ... >out.dot  2>out.err
 graphviz -Tpng out.dot -o out.png
 graphviz -Tsvg out.dot -o out.svg
 ```
