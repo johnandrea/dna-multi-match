@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9.9
+v0.9.10
 
 No support provided.
 """
@@ -117,8 +117,9 @@ def get_program_options():
     results['libpath'] = args.libpath
 
     # easy to get this one wrong, just drop back to default
-    if args.orientation.lower() in orientations:
-       results['orientation'] = args.orientation.lower()
+    value = args.orientation.lower()
+    if value in orientations:
+       results['orientation'] = value
 
     return results
 
@@ -363,7 +364,7 @@ def start_dot( label, orientation ):
     """ Start of the DOT output file """
     print( 'digraph family {' )
     print( 'node [shape=record];' )
-    print( 'rankdir=' + orientation + ';' )
+    print( 'rankdir=' + orientation.upper() + ';' )
     print( 'labelloc="t";' )
     print( 'label="' + label + '";' )
 
@@ -690,7 +691,7 @@ for indi in testers:
     if options['show-each']:
        if not within_range[indi]:
           print( 'No one', file=sys.stderr )
-    print( '', file=sys.stderr )
+       print( '', file=sys.stderr )
 
 # add them together to find the potential common matches
 matches = readgedcom.list_intersection( *list(within_range.values()) )
