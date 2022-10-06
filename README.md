@@ -52,7 +52,7 @@ At least this many testers is required for the program to run. Default is 3
 --smallest-match=value
 
 At least one of the testers must have a DNA match value (in cM) for the program
-to run. Default is 866.
+to run. Default is 866 which is the average value for a 1st cousin match.
 
 --show-each
 
