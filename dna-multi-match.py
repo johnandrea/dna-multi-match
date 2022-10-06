@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9.2
+v0.9.3
 
 No support provided.
 """
@@ -607,6 +607,15 @@ def find_ids_of_testers( tag, testers, individuals ):
     return results
 
 
+def find_blood_related( indi, everyone_ancestor_fams ):
+    # first determine, which families have this person as a parent
+    as_parent = []
+    if 'fams' in data[i_key][indi]:
+       as_parent = data[i_key][indi]['fams']
+
+    return find_nearest_common_ancestors( indi, as_parent, everyone_ancestor_fams, data[f_key] )
+
+
 def person_info( indi ):
     return get_name( data[i_key][indi] ) + ' (xref ' + str(data[i_key][indi]['xref']) + ')'
 
@@ -654,12 +663,9 @@ for indi in data[i_key]:
 
 blood_related = dict()
 for indi in testers:
-    # first determine, which families have this person as a parent
-    as_parent = []
-    if 'fams' in data[i_key][indi]:
-       as_parent = data[i_key][indi]['fams']
+    blood_related[indi] = find_blood_related( indi, ancestor_fams )
 
-    blood_related[indi] = find_nearest_common_ancestors( indi, as_parent, ancestor_fams, data[f_key] )
+# setup relationships
 
 for indi in testers:
     for other in blood_related[indi]:
@@ -692,17 +698,19 @@ n_matches = len( matches )
 
 print( 'The intersection of matches has', n_matches, 'people', file=sys.stderr )
 
-if n_matches < 1:
-   print( '', file=sys.stderr )
-   print( 'No one to draw', file=sys.stderr )
-   sys.exit(1)
+# show the matches
 
 for indi in matches:
     print( '   ', person_info(indi), file=sys.stderr )
 
+if n_matches < 1:
+   print( '', file=sys.stderr )
+   print( 'No one to draw. Exiting', file=sys.stderr )
+   sys.exit(1)
+
 if n_matches >= options['max-results']:
    print( '', file=sys.stderr )
-   print( 'Too many people to draw in a tree', file=sys.stderr )
+   print( 'Too many people to draw in a tree. Exiting', file=sys.stderr )
    sys.exit(1)
 
 
@@ -725,11 +733,22 @@ for indi in matches:
         fams_along_paths[ancestor_fam] = True
 
 # step 2: list all the shared families of all the people of interest
+
+# add matches to the blood relations info
+
+for indi in matches:
+    if indi not in blood_related:
+       blood_related[indi] = find_blood_related( indi, ancestor_fams )
+
 all_shared_fams = dict()
 for indi in matches:
     for them in blood_related[indi]:
         if them in matches and them != indi:
            all_shared_fams[blood_related[indi][them]['closest']] = True
+
+print( '', file=sys.stderr ) #debug
+for fam in all_shared_fams: #debug
+    print( 'family to show:', fam, file=sys.stderr ) #debug
 
 
 
