@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9.4
+v0.9.9
 
 No support provided.
 """
@@ -16,8 +16,9 @@ import importlib.util
 import re
 import os
 
+# need to check if these cause trouble with color-blindness
 MATCH_COLOR = 'orange'
-BASE_COLOR = 'lightblue'
+TESTER_COLOR = 'lightblue'
 
 
 def load_my_module( module_name, relative_path ):
@@ -377,7 +378,7 @@ def dot_labels( ged_indis, ged_fams, base_people, people_of_interest, people_in_
         print( dot_id, '[label=' + s.replace("'",'.') + extra + '];' )
 
     match_style = ',style=filled,color=' + MATCH_COLOR
-    base_style = ',style=filled,color=' + BASE_COLOR
+    base_style = ',style=filled,color=' + TESTER_COLOR
 
     for indi in people_of_interest:
         # a family person will be added later
