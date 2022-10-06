@@ -61,7 +61,7 @@ If added then the intermediate match results for each tester will be printed to 
 --orientation=direction
 
 Change the orientatation of the diagram in the DOT file output. Default is "TB" for top-to-bottom.
-Other choices are "LR" for left to right plus "BT" and "RL".
+Other choices are "LR" for left-to-right plus "BT" 9bottom-top) and "RL" (right-left).
 
 --reverse-arrows
 
