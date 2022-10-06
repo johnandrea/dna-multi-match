@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9
+v0.9.1
 
 No support provided.
 """
@@ -172,56 +172,6 @@ def are_options_ok( program_options ):
     return result
 
 
-def make_label( indi_data, people_info ):
-    label = 'DNA matches between'
-    for indi in people_info:
-        label += '\\n' + get_name( indi_data[indi] ) + ' @ ' + str(people_info[indi]) + ' cM'
-    return label
-
-
-def make_dot_id( xref ):
-    return xref.lower().replace('@','').replace('i','').replace('f','').replace('.','')
-
-def make_fam_dot_id( xref ):
-    return 'f' + make_dot_id( str(xref) )
-
-def make_indi_dot_id( xref ):
-    return 'i' + make_dot_id( str(xref) )
-
-
-def start_dot( label, orientation ):
-    """ Start of the DOT output file """
-    print( 'digraph family {' )
-    print( 'node [shape=record];' )
-    print( 'rankdir=' + orientation + ';' )
-    print( 'labelloc="t";' )
-    print( 'label="' + label + '";' )
-
-
-def end_dot():
-    """ End of the DOT output file """
-    print( '}' )
-
-
-def get_name( individual ):
-    """ Return the name for the individual in the passed data section. """
-    name = individual['name'][0]['value']
-    # the standard unknown code is not good for svg output
-    if '?' in name and '[' in name and ']' in name:
-       name = 'unknown'
-    return name.replace( '/', '' ).replace('"','&quot;').replace("'","&rsquo;")
-
-
-def get_names( get_indis, family ):
-    """ Return names of both people in the family, by id """
-    results = dict()
-    for partner in ['husb','wife']:
-        if partner in family:
-           partner_id = family[partner][0]
-           results[partner_id] = get_name( get_indis[partner_id] )
-    return results
-
-
 def define_dna_ranges():
    # values via DNA Painter Shared cM Project
    # https://dnapainter.com/tools/sharedcmv
@@ -370,6 +320,140 @@ def find_relation_label( relation_data ):
             result = str(me - 1) + 'C' + str(y) + 'R'
 
     return result
+
+
+def get_name( individual ):
+    """ Return the name for the individual in the passed data section. """
+    name = individual['name'][0]['value']
+    # the standard unknown code is not good for svg output
+    if '?' in name and '[' in name and ']' in name:
+       name = 'unknown'
+    return name.replace( '/', '' ).replace('"','&quot;').replace("'","&rsquo;")
+
+
+def get_names( get_indis, family ):
+    """ Return names of both people in the family, by id """
+    results = dict()
+    for partner in ['husb','wife']:
+        if partner in family:
+           partner_id = family[partner][0]
+           results[partner_id] = get_name( get_indis[partner_id] )
+    return results
+
+
+def make_label( indi_data, people_info ):
+    label = 'DNA matches between'
+    for indi in people_info:
+        label += '\\n' + get_name( indi_data[indi] ) + ' @ ' + str(people_info[indi]) + ' cM'
+    return label
+
+
+def make_dot_id( xref ):
+    return xref.lower().replace('@','').replace('i','').replace('f','').replace('.','')
+
+def make_fam_dot_id( xref ):
+    return 'f' + make_dot_id( str(xref) )
+
+def make_indi_dot_id( xref ):
+    return 'i' + make_dot_id( str(xref) )
+
+
+def start_dot( label, orientation ):
+    """ Start of the DOT output file """
+    print( 'digraph family {' )
+    print( 'node [shape=record];' )
+    print( 'rankdir=' + orientation + ';' )
+    print( 'labelloc="t";' )
+    print( 'label="' + label + '";' )
+
+
+def end_dot():
+    """ End of the DOT output file """
+    print( '}' )
+
+
+def dot_labels( ged_indis, ged_fams, base_people, people_of_interest, people_in_fams ):
+    def output_label( dot_id, s, extra ):
+        print( dot_id, '[label=' + s.replace("'",'.') + extra + '];' )
+
+    match_style = ',style=filled,color=' + MATCH_COLOR
+    base_style = ',style=filled,color=' + BASE_COLOR
+
+    for indi in people_of_interest:
+        # a family person will be added later
+        if indi not in people_in_fams:
+           name = get_name( ged_indis[indi] ).strip()
+           with_color = match_style
+           if indi in base_people:
+              with_color = base_style
+           output_label( make_indi_dot_id(indi), '"' + name + '"', with_color )
+
+    # find the families to draw
+    fams_in_use = dict()
+
+    # the parents of the people are always drawn
+    for indi in people_of_interest:
+        fam = people_of_interest[indi]
+        if fam not in fams_in_use:
+           fams_in_use[fam] = []
+
+    # other families along the paths,
+    # tracking whick ones have a partner which also links to parents
+    for indi in people_in_fams:
+        for from_to in people_in_fams[indi]:
+            for fam_type in ['from','to']:
+                fam = from_to[fam_type]
+                if fam not in fams_in_use:
+                   fams_in_use[fam] = []
+                fams_in_use[fam].append( indi )
+
+    for fam in fams_in_use:
+        names = get_names( ged_indis, ged_fams[fam] )
+        extra_info = ''
+        text = ''
+        for indi in names:
+            if indi in people_of_interest:
+               extra_info = match_style
+            if indi in base_people:
+               extra_info = base_style
+            if text:
+               # second parent
+               text += '|<p>|'
+            text += '<' + make_indi_dot_id(indi) + '>' + names[indi].strip()
+        output_label( make_fam_dot_id(fam), '"' + text + '"', extra_info )
+
+
+def dot_connect( reverse, people_of_interest, people_in_fams ):
+    def make_dup_check( one, two ):
+        return str(one) +':'+ str(two)
+
+    # this is a hack
+    # why are doubles produced
+    already_used = []
+
+    for indi in people_of_interest:
+        dup_test = make_dup_check( indi, people_of_interest[indi] )
+        if dup_test in already_used:
+           continue
+        already_used.append( dup_test )
+        indi_dot = make_indi_dot_id(indi)
+        fam_dot = make_fam_dot_id(people_of_interest[indi] +':p' )
+        if reverse:
+           print( fam_dot, '->', indi_dot )
+        else:
+           print( indi_dot, '->', fam_dot )
+
+    for indi in people_in_fams:
+        for from_to in people_in_fams[indi]:
+            dup_test = make_dup_check( from_to['from'], from_to['to'] )
+            already_used.append( dup_test )
+            from_fam = make_fam_dot_id( from_to['from'] )
+            to_fam = make_fam_dot_id( from_to['to'] )
+            indi_dot = make_indi_dot_id(indi)
+            if reverse:
+               print( to_fam + ':p', '->', from_fam +':' + indi_dot )
+            else:
+               print( from_fam +':' + indi_dot, '->', to_fam + ':p' )
 
 
 def get_ancestor_families( indi, ged_indis, ged_fams ):
@@ -621,6 +705,7 @@ if n_matches >= options['max-results']:
    print( 'Too many people to draw in a tree', file=sys.stderr )
    sys.exit(1)
 
+
 # To draw the tree, connect people of interest to ancestor families
 # and let the drawing program sort it out (Graphviz)
 #
@@ -631,5 +716,5 @@ if n_matches >= options['max-results']:
 
 start_dot( make_label( data[i_key], testers ), options['orientation'] )
 #dot_labels( data[i_key], data[f_key], testers.keys(), parent_link, partner_to_parent )
-#dot_connect( parent_link, partner_to_parent )
+#dot_connect( options['reverse'], parent_link, partner_to_parent )
 end_dot()
