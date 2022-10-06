@@ -34,6 +34,8 @@ This is the set testers info to consider for the family matching.
 Given as a list of as a space separated list of pairs with each pair as tester-id (see id-item)
 comma DNA value in cM.
 
+See the example below and the .cmd files in the example sets.
+
 --id-item=value
 
 This is the item which will identify the tester. Default is "xref" which is the individual
