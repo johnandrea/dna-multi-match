@@ -19,6 +19,7 @@ import os
 MATCH_COLOR = 'orange'
 BASE_COLOR = 'lightblue'
 
+
 def load_my_module( module_name, relative_path ):
     """
     Load a module in my own single .py file. Requires Python 3.6+
@@ -171,8 +172,6 @@ def are_options_ok( program_options ):
     return result
 
 
-
-
 def make_label( indi_data, people_info ):
     label = 'DNA matches between'
     for indi in people_info:
@@ -188,6 +187,7 @@ def make_fam_dot_id( xref ):
 
 def make_indi_dot_id( xref ):
     return 'i' + make_dot_id( str(xref) )
+
 
 def start_dot( label, orientation ):
     """ Start of the DOT output file """
@@ -612,6 +612,11 @@ if n_matches >= options['max-results']:
    print( 'Too many people to draw in a tree', file=sys.stderr )
    sys.exit(1)
 
-start_dot( make_label( data[i_key], testers ), options['orientation'] )
+# -------------
+# make tree diagram
+# -------------
 
+start_dot( make_label( data[i_key], testers ), options['orientation'] )
+#dot_labels( data[i_key], data[f_key], testers.keys(), parent_link, partner_to_parent )
+#dot_connect( parent_link, partner_to_parent )
 end_dot()
