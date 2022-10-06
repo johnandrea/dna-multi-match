@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9.1
+v0.9.2
 
 No support provided.
 """
@@ -712,6 +712,25 @@ if n_matches >= options['max-results']:
 # But at some point, at the top of the tree, families doesn't connect to their ancestors.
 # In order to know where to stop find the shared ancestor families
 # who's partners don't have any shared sncestors from the people of interest.
+
+# step 1: make the list of all families heading to the top
+
+# the testers need to be included
+for indi in testers:
+    matches.append( indi )
+
+fams_along_paths = dict()
+for indi in matches:
+    for ancestor_fam in ancestor_fams[indi]:
+        fams_along_paths[ancestor_fam] = True
+
+# step 2: list all the shared families of all the people of interest
+all_shared_fams = dict()
+for indi in matches:
+    for them in blood_related[indi]:
+        if them in matches and them != indi:
+           all_shared_fams[blood_related[indi][them]['closest']] = True
+
 
 
 start_dot( make_label( data[i_key], testers ), options['orientation'] )
