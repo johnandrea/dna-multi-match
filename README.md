@@ -32,8 +32,11 @@ given as the first item on the command line.
 --testers  id1,dna1 id2,dna2 id3,dna3 ...
 
 This is the set testers info to consider for the family matching.
-Given as a list of as a space separated list of pairs with each pair as tester-id (see id-item)
-comma DNA value in cM.
+Specify as a space separated list of pairs with each pair of tester-id
+comma numeric DNA match value.
+
+See id-item option for acceptible values for the tester-id.
+The DNA value only accepts whole numbers, not fractional numbers.
 
 See the example below and the .cmd files in the example sets.
 
