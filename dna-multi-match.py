@@ -62,7 +62,7 @@ def get_program_options():
     results['min-testers'] = 3
     results['smallest-match'] = 866 #average 1st cousin
     results['orientation'] = 'lr'
-    results['iditem'] = 'xref'
+    results['id-item'] = 'xref'
     results['show-each'] = False
     results['reverse'] = False
     results['libpath'] = '.'
@@ -84,14 +84,14 @@ def get_program_options():
 
     arg_help = 'How to find the person in the input. Default is the gedcom id "xref".'
     arg_help += ' Othewise choose "type.exid", "type.refnum", etc.'
-    parser.add_argument( '--iditem', default=results['iditem'], type=str, help=arg_help )
+    parser.add_argument( '--id-item', default=results['id-item'], type=str, help=arg_help )
 
     arg_help = 'Show matches of each tester to stderr. Might result in a lot of output.'
     parser.add_argument( '--show-each', default=results['show-each'], action='store_true', help=arg_help )
 
     # in dot files, change direction of the arrows
     arg_help = 'For dot file output, reverse the order of the link arrows.'
-    parser.add_argument( '--reverse', default=results['reverse'], action='store_true', help=arg_help )
+    parser.add_argument( '--reverse-arrows', default=results['reverse'], action='store_true', help=arg_help )
 
     # maybe this should be changed to have a type which better matched a directory
     arg_help = 'Location of the gedcom library. Default is current directory.'
@@ -105,18 +105,18 @@ def get_program_options():
     args = parser.parse_args()
 
     results['testers'] = args.testers
-    results['iditem'] = args.iditem.lower()
+    results['id-item'] = args.id_item.lower()
     results['max-results'] = args.max_results
     results['min-testers'] = args.min_testers
     results['smallest-match'] = args.smallest_match
     results['show-each'] = args.show_each
     results['infile'] = args.infile.name
-    results['reverse'] = args.reverse
+    results['reverse'] = args.reverse_arrows
     results['libpath'] = args.libpath
 
     # easy to get this one wrong, just drop back to default
     if args.orientation.lower() in orientations:
-       results[''] = args.orientation.lower()
+       results['orientation'] = args.orientation.lower()
 
     return results
 
@@ -291,6 +291,8 @@ def find_relation_label( relation_data ):
     # Note the use of non-gender specific labels
     # "auncle" = "aunt or uncle"
     # "nibling" = "niece or nephew"
+    #
+    # Note that the labels used here must be the same as in the dna-range setup.
 
     me = relation_data['gen-me']
     them = relation_data['gen-them']
@@ -484,12 +486,12 @@ def find_ids_of_testers( tag, testers, individuals ):
               print( err_prefix, 'id isn\'t an xref number:', show_test, file=sys.stderr )
 
         elif tag.startswith( 'type.' ):
-           subtag = tag.replace( 'type.' )
+           subtag = tag.replace( 'type.', '' )
            for indi in individuals:
                if 'even' in individuals[indi]:
-                  for event in individual[tag]:
+                  for event in individuals[indi]['even']:
                       if 'type' in event and event['type'] == subtag:
-                         if ??? == parts[1]:
+                         if event['value'] == parts[0]:
                             found_id = indi
                             break
 
@@ -532,7 +534,7 @@ data = readgedcom.read_file( options['infile'] )
 
 dna_ranges = define_dna_ranges()
 
-testers = find_ids_of_testers( options['iditem'], options['testers'], data[i_key] )
+testers = find_ids_of_testers( options['id-item'], options['testers'], data[i_key] )
 if len( testers ) != len( options['testers'] ):
    # error messages have already been printed
    sys.exit(1)
@@ -612,6 +614,6 @@ if len(people) >= options['max-results']:
    print( 'Too many people to draw in a tree', file=sys.stderr )
    sys.exit(1)
 
-start_dot( make_label( data[i_key], testers ), options['orienration'] )
+start_dot( make_label( data[i_key], testers ), options['orientation'] )
 
 end_dot()
