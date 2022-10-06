@@ -23,37 +23,47 @@ No installation process. Copy the program and the library.
 
 The input is a GEDCOM file exported from a genealogy program.
 
+Note that because the --testers option is a space delimited list, the input file should be
+given as the first item on the command line.
+
 ## Options
 
---testers  list of pairs of matches
+--testers  id1,dna1 id2,dna2 id3,dna3 ...
 
---iditem=value
+This is the set testers info to consider for the family matching.
+Given as a list of as a space separated list of pairs with each pair as tester-id (see id-item)
+comma DNA value in cM.
 
-Default is "xref".
+--id-item=value
+
+This is the item which will identify the tester. Default is "xref" which is the individual
+XREF value in the GEDCOM file.
+Other options might be "uuid", etc. If using a GEDCOM custom type specify it as "type." followed by
+the type name, such as "type.extid", "type.refnumber", etc.
 
 --max-results=value
 
-Default is 14.
+More than this many final matches is considered too many to display. Default is 14.
 
 --min-testers=value
 
-Default is 3
+At least this many testers is required for the program to run. Default is 3
 
 --smallest-match=value
 
-Default is 866.
+At least one of the testers must have a DNA match value (in cM) for the program
+to run. Default is 866.
 
 --show-each
 
-If added then the intermeduate match results for each tester will be printed to std-err.
-Might generate a lot of output.
+If added then the intermediate match results for each tester will be printed to std-err.
 
 --orientation=direction
 
 Change the orientatation of the diagram in the DOT file output. Default is "TB" for top-to-bottom.
 Other choices are "LR" for left to right plus "BT" and "RL".
 
---reverse
+--reverse-arrows
 
 Change the direction of the arrows which usually point from parent to child.
 
