@@ -130,6 +130,7 @@ This code is provided with neither support nor warranty.
 
 ### Future enhancements
 
+- Ensure colour-blindness isn't a problem on the result diagram
 - Ensure "half" relationships are hendled properly
 - Handle non-ASCII names in a manner better for SVG output.
 - Handle family matched above the tree top.
