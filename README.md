@@ -89,7 +89,7 @@ The known generalogy is illustrated here:
 
 There are three DNA testers named T1, T2, T3.
 
-T1 matched the unidentified person at 1000 cM. It could be one of the these blood relatives marked in orange:
+T1 matched the unidentified person at 1000 cM. It could be one of these blood relatives marked in orange:
 
 ![T1 matches](example-1/t1.png)
 
