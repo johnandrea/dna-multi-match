@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v1.0
+v0.9
 
 No support provided.
 """
@@ -210,6 +210,16 @@ def get_name( individual ):
     if '?' in name and '[' in name and ']' in name:
        name = 'unknown'
     return name.replace( '/', '' ).replace('"','&quot;').replace("'","&rsquo;")
+
+
+def get_names( get_indis, family ):
+    """ Return names of both people in the family, by id """
+    results = dict()
+    for partner in ['husb','wife']:
+        if partner in family:
+           partner_id = family[partner][0]
+           results[partner_id] = get_name( get_indis[partner_id] )
+    return results
 
 
 def define_dna_ranges():
@@ -591,7 +601,6 @@ for indi in testers:
           print( 'No one', file=sys.stderr )
     print( '', file=sys.stderr )
 
-
 # add them together to find the potential common matches
 matches = readgedcom.list_intersection( *list(within_range.values()) )
 
@@ -612,9 +621,13 @@ if n_matches >= options['max-results']:
    print( 'Too many people to draw in a tree', file=sys.stderr )
    sys.exit(1)
 
-# -------------
-# make tree diagram
-# -------------
+# To draw the tree, connect people of interest to ancestor families
+# and let the drawing program sort it out (Graphviz)
+#
+# But at some point, at the top of the tree, families doesn't connect to their ancestors.
+# In order to know where to stop find the shared ancestor families
+# who's partners don't have any shared sncestors from the people of interest.
+
 
 start_dot( make_label( data[i_key], testers ), options['orientation'] )
 #dot_labels( data[i_key], data[f_key], testers.keys(), parent_link, partner_to_parent )
