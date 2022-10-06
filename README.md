@@ -31,7 +31,7 @@ given as the first item on the command line.
 
 --testers  id1,dna1 id2,dna2 id3,dna3 ...
 
-This is the set testers info to consider for the family matching.
+This is the set of testers info to consider for the family matching.
 Specify as a space separated list of pairs with each pair of tester-id
 comma numeric DNA match value.
 
