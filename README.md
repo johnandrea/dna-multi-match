@@ -62,7 +62,7 @@ to run. Default is 866 which is the average value for a 1st cousin match.
 
 --show-each
 
-Allow intermediate match results for each tester will be printed to std-err.
+Allow intermediate match results for each tester to be printed to std-err.
 
 --orientation=direction
 
