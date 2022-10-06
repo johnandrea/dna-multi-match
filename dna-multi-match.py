@@ -593,23 +593,21 @@ for indi in testers:
 
 
 # add them together to find the potential common matches
+matches = readgedcom.list_intersection( *list(within_range.values()) )
 
-people = within_range[ list(testers.keys())[0] ]
-for indi in testers:
-    temp_list = people
-    people = readgedcom.list_intersection( temp_list, within_range[indi] )
+n_matches = len( matches )
 
-print( 'The intersection of matches has', len(people), 'people', file=sys.stderr )
+print( 'The intersection of matches has', n_matches, 'people', file=sys.stderr )
 
-if len(people) < 1:
+if n_matches < 1:
    print( '', file=sys.stderr )
    print( 'No one to draw', file=sys.stderr )
    sys.exit(1)
 
-for indi in people:
+for indi in matches:
     print( '   ', person_info(indi), file=sys.stderr )
 
-if len(people) >= options['max-results']:
+if n_matches >= options['max-results']:
    print( '', file=sys.stderr )
    print( 'Too many people to draw in a tree', file=sys.stderr )
    sys.exit(1)
