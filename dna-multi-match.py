@@ -16,6 +16,8 @@ import importlib.util
 import re
 import os
 
+MATCH_COLOR = 'orange'
+BASE_COLOR = 'lightblue'
 
 def load_my_module( module_name, relative_path ):
     """
@@ -43,6 +45,10 @@ def load_my_module( module_name, relative_path ):
     module_spec.loader.exec_module( my_module )
 
     return my_module
+
+
+def looks_like_int( s ):
+    return re.match( r'\d\d*$', s )
 
 
 def get_program_options():
@@ -99,26 +105,20 @@ def get_program_options():
     args = parser.parse_args()
 
     results['testers'] = args.testers
+    results['iditem'] = args.iditem.lower()
     results['max-results'] = args.max_results
     results['min-testers'] = args.min_testers
-    results['iditem'] = args.iditem.lower()
+    results['smallest-match'] = args.smallest_match
     results['show-each'] = args.show_each
     results['infile'] = args.infile.name
     results['reverse'] = args.reverse
     results['libpath'] = args.libpath
 
-    # don't allow an impossible value
-    if args.smallest_match > 1:
-       results['smallest-match'] = args.smallest_match
-
+    # easy to get this one wrong, just drop back to default
     if args.orientation.lower() in orientations:
        results[''] = args.orientation.lower()
 
     return results
-
-
-def looks_like_int( s ):
-    return re.match( r'\d\d*$', s )
 
 
 def are_options_ok( program_options ):
@@ -156,7 +156,51 @@ def are_options_ok( program_options ):
        print( 'Expected', expecting, 'pairs of id,dna for the testers. Found', n, file=sys.stderr )
        result = False
 
+    for item in ['max-results', 'min-testers']:
+        x = program_options[item]
+        if x <= 0:
+           print( 'Option', item, 'must be greater than zero, not', x, file=sys.stderr )
+           result = False
+
+    for item in ['smallest-match']:
+        x = program_options[item]
+        if x <= 1:
+           print( 'Option', item, 'must be greater than 1, not', x, file=sys.stderr )
+           result = False
+
     return result
+
+
+
+
+def make_label( indi_data, people_info ):
+    label = 'DNA matches between'
+    for indi in people_info:
+        label += '\\n' + get_name( indi_data[indi] ) + ' @ ' + str(people_info[indi]) + ' cM'
+    return label
+
+
+def make_dot_id( xref ):
+    return xref.lower().replace('@','').replace('i','').replace('f','').replace('.','')
+
+def make_fam_dot_id( xref ):
+    return 'f' + make_dot_id( str(xref) )
+
+def make_indi_dot_id( xref ):
+    return 'i' + make_dot_id( str(xref) )
+
+def start_dot( label, orientation ):
+    """ Start of the DOT output file """
+    print( 'digraph family {' )
+    print( 'node [shape=record];' )
+    print( 'rankdir=' + orientation + ';' )
+    print( 'labelloc="t";' )
+    print( 'label="' + label + '";' )
+
+
+def end_dot():
+    """ End of the DOT output file """
+    print( '}' )
 
 
 def get_name( individual ):
@@ -440,9 +484,14 @@ def find_ids_of_testers( tag, testers, individuals ):
               print( err_prefix, 'id isn\'t an xref number:', show_test, file=sys.stderr )
 
         elif tag.startswith( 'type.' ):
+           subtag = tag.replace( 'type.' )
            for indi in individuals:
-               if 'event' in individuals[indi]:
-                  print( '???' )
+               if 'even' in individuals[indi]:
+                  for event in individual[tag]:
+                      if 'type' in event and event['type'] == subtag:
+                         if ??? == parts[1]:
+                            found_id = indi
+                            break
 
         else:
            # its a top level tag of some sort, maybe even uuid
@@ -562,3 +611,7 @@ if len(people) >= options['max-results']:
    print( '', file=sys.stderr )
    print( 'Too many people to draw in a tree', file=sys.stderr )
    sys.exit(1)
+
+start_dot( make_label( data[i_key], testers ), options['orienration'] )
+
+end_dot()
