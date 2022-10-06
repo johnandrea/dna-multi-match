@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9.3
+v0.9.4
 
 No support provided.
 """
@@ -439,9 +439,9 @@ def dot_connect( reverse, people_of_interest, people_in_fams ):
         indi_dot = make_indi_dot_id(indi)
         fam_dot = make_fam_dot_id(people_of_interest[indi] +':p' )
         if reverse:
-           print( fam_dot, '->', indi_dot )
-        else:
            print( indi_dot, '->', fam_dot )
+        else:
+           print( fam_dot, '->', indi_dot )
 
     for indi in people_in_fams:
         for from_to in people_in_fams[indi]:
@@ -451,9 +451,9 @@ def dot_connect( reverse, people_of_interest, people_in_fams ):
             to_fam = make_fam_dot_id( from_to['to'] )
             indi_dot = make_indi_dot_id(indi)
             if reverse:
-               print( to_fam + ':p', '->', from_fam +':' + indi_dot )
-            else:
                print( from_fam +':' + indi_dot, '->', to_fam + ':p' )
+            else:
+               print( to_fam + ':p', '->', from_fam +':' + indi_dot )
 
 
 def get_ancestor_families( indi, ged_indis, ged_fams ):
@@ -746,13 +746,34 @@ for indi in matches:
         if them in matches and them != indi:
            all_shared_fams[blood_related[indi][them]['closest']] = True
 
-print( '', file=sys.stderr ) #debug
-for fam in all_shared_fams: #debug
-    print( 'family to show:', fam, file=sys.stderr ) #debug
+# step 3: individuals along the path who don't have a shared ancestor family
+# The resulting list will be who from each family connects to their parents family.
+# Aside from the persons of interest who will always connect to their parents.
+# The from/to portion is a list because a person could have multiple "from" families
 
+partner_to_parent = dict()
+already_tested = []
+for fam in fams_along_paths:
+    for partner in ['husb','wife']:
+        if partner in data[f_key][fam]:
+           partner_id = data[f_key][fam][partner][0]
+           for ancestor_fam in ancestor_fams[partner_id]:
+               if ancestor_fam in all_shared_fams:
+                  parents = data[i_key][partner_id]['famc'][0]
+                  dup_test = str(fam) +':'+ str(parents)
+                  if dup_test in already_tested:
+                     continue
+                  already_tested.append( dup_test )
+                  if partner_id not in partner_to_parent:
+                     partner_to_parent[partner_id] = []
+                  partner_to_parent[partner_id].append( { 'from':fam, 'to':parents } )
 
+# track people to parents, but only the ones in the path
+parent_link = dict()
+for indi in matches:
+    parent_link[indi] = data[i_key][indi]['famc'][0]
 
 start_dot( make_label( data[i_key], testers ), options['orientation'] )
-#dot_labels( data[i_key], data[f_key], testers.keys(), parent_link, partner_to_parent )
-#dot_connect( options['reverse'], parent_link, partner_to_parent )
+dot_labels( data[i_key], data[f_key], testers.keys(), parent_link, partner_to_parent )
+dot_connect( options['reverse'], parent_link, partner_to_parent )
 end_dot()
