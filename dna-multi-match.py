@@ -2,10 +2,13 @@
 
 """
 Find the intersection of DNA test matches from multiple people.
+Input is a GEDCOM file and a set of people with DNA values
+Output a Graphviz DOT file to std-out
+Output a list of matches to std-err
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9.12
+v1.0
 
 No support provided.
 """
