@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9.11
+v0.9.12
 
 No support provided.
 """
@@ -63,7 +63,7 @@ def get_program_options():
     results['max-results'] = 14
     results['min-testers'] = 3
     results['smallest-match'] = 866 #average 1st cousin
-    results['orientation'] = 'lr'
+    results['orientation'] = 'tb'
     results['id-item'] = 'xref'
     results['show-each'] = False
     results['reverse'] = False
