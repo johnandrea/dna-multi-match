@@ -5,7 +5,7 @@ Find the intersection of DNA test matches from multiple people.
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v0.9.10
+v0.9.11
 
 No support provided.
 """
@@ -695,6 +695,9 @@ for indi in testers:
 
 # add them together to find the potential common matches
 matches = readgedcom.list_intersection( *list(within_range.values()) )
+
+# of course the testers won't be in the matches because a person can't
+# match with themselves
 
 n_matches = len( matches )
 
