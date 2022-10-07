@@ -44,7 +44,7 @@ See the example below and the .cmd files in the example sets.
 
 Specify the item to identify the tester via each tester id. Default is "xref" which is the individual
 XREF value in the GEDCOM file.
-Other options might be "uuid", etc. If using a GEDCOM custom type specify it as "type." followed by
+Other options might be "uuid", "refn", etc. If using a GEDCOM custom type specify it as "type." followed by
 the type name, i.e. "type.extid", "type.refnumber", etc.
 
 --max-results=value
