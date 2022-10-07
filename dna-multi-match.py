@@ -8,7 +8,7 @@ Output a list of matches to std-err
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v1.0
+v1.1
 
 No support provided.
 """
@@ -596,10 +596,11 @@ def find_ids_of_testers( tag, testers, individuals ):
 
         else:
            # its a top level tag of some sort, maybe even uuid
-           # Hopefully not "name" or "sex" or something else not useful
+           # Hopefully not "name" or "sex" or something else not useful.
+           # These id type tags are also stored in a list, so get the zero'th element.
            for indi in individuals:
                if tag in individuals[indi]:
-                  if individuals[indi][tag] == parts[0]:
+                  if individuals[indi][tag][0] == parts[0]:
                      found_id = indi
                      break
 
