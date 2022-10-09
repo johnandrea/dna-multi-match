@@ -47,6 +47,8 @@ XREF value in the GEDCOM file.
 Other options might be "uuid", "refn", etc. If using a GEDCOM custom type specify it as "type." followed by
 the type name, i.e. "type.extid", "type.refnumber", etc.
 
+Names, dates, etc. shouldn't be used because they might not be unique and have complex structures.
+
 --max-results=value
 
 The limit on too many final matches to display. Default is 14.
