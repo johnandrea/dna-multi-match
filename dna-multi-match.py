@@ -8,7 +8,7 @@ Output a list of matches to std-err
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v1.1
+v1.2
 
 No support provided.
 """
@@ -173,6 +173,11 @@ def are_options_ok( program_options ):
         if x <= 1:
            print( 'Option', item, 'must be greater than 1, not', x, file=sys.stderr )
            result = False
+
+    x = program_options['id-item']
+    if x in ['name','birt','birth','deat','death']:
+       print( 'id-item not appropriate:', x, file=sys.stderr )
+       result = False
 
     return result
 
@@ -568,6 +573,8 @@ def find_ids_of_testers( tag, testers, individuals ):
 
         parts = test.split(',')
 
+        n_found = 0
+
         if tag == 'xref':
            # maybe the user has given the full id "@Ix@" or just the number
            # so reduce it to just the number
@@ -578,7 +585,7 @@ def find_ids_of_testers( tag, testers, individuals ):
               for indi in individuals:
                   if individuals[indi]['xref'] == wanted:
                      found_id = indi
-                     break
+                     n_found += 1
 
            else:
               id_ok = False
@@ -592,23 +599,39 @@ def find_ids_of_testers( tag, testers, individuals ):
                       if 'type' in event and event['type'] == subtag:
                          if event['value'] == parts[0]:
                             found_id = indi
-                            break
+                            n_found += 1
 
         else:
-           # its a top level tag of some sort, maybe even uuid
-           # Hopefully not "name" or "sex" or something else not useful.
-           # These id type tags are also stored in a list, so get the zero'th element.
+           # Its a top level tag of some sort, maybe even uuid
+           # abort if its not a simple value
            for indi in individuals:
                if tag in individuals[indi]:
-                  if individuals[indi][tag][0] == parts[0]:
-                     found_id = indi
-                     break
 
-        if found_id is None:
+                  if isinstance( individuals[indi][tag], str ):
+                     if individuals[indi][tag] == parts[0]:
+                        found_id = indi
+                        n_found += 1
+
+                  elif isinstance( individuals[indi][tag], list ):
+                     for value in individuals[indi][tag]:
+                         # also check for appropriate type, but not reporting
+                         if isinstance( value, str ):
+                            if value == parts[0]:
+                               found_id = indi
+                               n_found += 1
+
+                  else:
+                     print( 'id-item not appropriate for locating individuals.', file=sys.stderr )
+                     print( 'Program exiting', file=sys.stderr )
+                     sys.exit(1)
+
+        if n_found == 0:
            if id_ok:
               print( err_prefix, 'not located in the GEDCOM:', show_test, file=sys.stderr )
-        else:
+        elif n_found == 1:
            results[found_id] = int( parts[1] )
+        else:
+           print( err_prefix, 'more than one individual', show_test, file=sys.stderr )
 
     return results
 
