@@ -184,7 +184,7 @@ def are_options_ok( program_options ):
 
 def define_dna_ranges():
    # values via DNA Painter Shared cM Project
-   # https://dnapainter.com/tools/sharedcmv2
+   # https://dnapainter.com/tools/sharedcmv4
    #
    # Note the use of non-gender specific labels
    # "auncle" = "aunt or uncle"
