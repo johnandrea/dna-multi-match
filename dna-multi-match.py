@@ -8,7 +8,7 @@ Output a list of matches to std-err
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v1.2
+v1.3
 
 No support provided.
 """
@@ -652,10 +652,6 @@ options = get_program_options()
 
 if not are_options_ok( options ):
    sys.exit(1)
-
-if not os.path.isdir( options['libpath'] ):
-   print( 'Path to readgedcom is not a directory', file=sys.stderr )
-   sys.exit( 1 )
 
 readgedcom = load_my_module( 'readgedcom', options['libpath'] )
 
