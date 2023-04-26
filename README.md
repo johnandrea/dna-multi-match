@@ -75,9 +75,9 @@ Other choices are "LR" for left-to-right plus "BT" (bottom-top) and "RL" (right-
 
 Change the direction of the arrows which usually point from parent to child.
 
---libpath=relative-path-to-library
+--libpath=directory-containing-readgedcom
 
-The directory containing the readgedcom library, relative to the . Default is ".", the same location as this program file.
+The path is relative to the program being used. An absolute path will not work. Default is the same location as the program (".").
 
 ## Usage
 
