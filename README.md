@@ -75,6 +75,10 @@ Other choices are "LR" for left-to-right plus "BT" (bottom-top) and "RL" (right-
 
 Change the direction of the arrows which usually point from parent to child.
 
+--thick
+
+Produce thicker lines connecting people. This option can be added multiple times for extra thickness.
+
 --libpath=directory-containing-readgedcom
 
 Location containing the readgedcom.py library file. The path is relative to the program being used. An absolute path will not work. Default is the same location as the program (".").
