@@ -79,6 +79,10 @@ Change the direction of the arrows which usually point from parent to child.
 
 Location containing the readgedcom.py library file. The path is relative to the program being used. An absolute path will not work. Default is the same location as the program (".").
 
+--version
+
+Show the program version then exit.
+
 ## Usage
 
 ```
