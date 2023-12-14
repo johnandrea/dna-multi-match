@@ -73,6 +73,7 @@ def get_program_options():
     results['id-item'] = 'xref'
     results['show-each'] = False
     results['reverse'] = False
+    results['thick'] = 1
     results['libpath'] = '.'
 
     arg_help = 'Display intersection of potential matches from multiple testers.'
@@ -101,6 +102,10 @@ def get_program_options():
     arg_help = 'For dot file output, reverse the order of the link arrows.'
     parser.add_argument( '--reverse-arrows', default=results['reverse'], action='store_true', help=arg_help )
 
+    # this option can be repeated for extra thickness
+    arg_help = 'Increase width of connecting lines'
+    parser.add_argument( '--thick', action='count', help=arg_help )
+
     # maybe this should be changed to have a type which better matched a directory
     arg_help = 'Location of the gedcom library. Default is current directory.'
     parser.add_argument( '--libpath', default=results['libpath'], type=str, help=arg_help )
@@ -124,6 +129,10 @@ def get_program_options():
     results['infile'] = args.infile.name
     results['reverse'] = args.reverse_arrows
     results['libpath'] = args.libpath
+
+    value = args.thick
+    if value:
+       results['thick'] += value
 
     # easy to get this one wrong, just drop back to default
     value = args.orientation.lower()
@@ -374,10 +383,11 @@ def make_indi_dot_id( xref ):
     return 'i' + make_dot_id( str(xref) )
 
 
-def start_dot( label, orientation ):
+def start_dot( label, thickness, orientation ):
     """ Start of the DOT output file """
     print( 'digraph family {' )
     print( 'node [shape=record];' )
+    print( 'edge [penwidth=' + str( thickness ) + '];' )
     print( 'rankdir=' + orientation.upper() + ';' )
     print( 'labelloc="t";' )
     print( 'label="' + label + '";' )
@@ -807,7 +817,7 @@ parent_link = dict()
 for indi in matches:
     parent_link[indi] = data[i_key][indi]['famc'][0]
 
-start_dot( make_label( data[i_key], testers ), options['orientation'] )
+start_dot( make_label( data[i_key], testers ), options['thick'], options['orientation'] )
 dot_labels( data[i_key], data[f_key], testers.keys(), parent_link, partner_to_parent )
 dot_connect( options['reverse'], parent_link, partner_to_parent )
 end_dot()
