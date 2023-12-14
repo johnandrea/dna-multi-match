@@ -8,7 +8,6 @@ Output a list of matches to std-err
 
 This code is released under the MIT License: https://opensource.org/licenses/MIT
 Copyright (c) 2022 John A. Andrea
-v1.3
 
 No support provided.
 """
@@ -22,6 +21,10 @@ import os
 # need to check if these cause trouble with color-blindness
 MATCH_COLOR = 'orange'
 TESTER_COLOR = 'lightblue'
+
+
+def get_version():
+    return '1.4'
 
 
 def load_my_module( module_name, relative_path ):
@@ -104,6 +107,9 @@ def get_program_options():
 
     arg_help = 'Set of id,dna-value for each of the testers. Need at least ' + str(results['min-testers'])
     parser.add_argument( '--testers', type=str, nargs='+', help=arg_help )
+
+    arg_help = 'Show version then exit.'
+    parser.add_argument( '--version', action='version', version=get_version() )
 
     parser.add_argument('infile', type=argparse.FileType('r') )
 
